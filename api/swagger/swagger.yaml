@@ -1,0 +1,175 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: M.I.K.E - Monitorization API
+# during dev, should point to your local machine
+host: localhost:8080
+# basePath prefixes all resource paths
+basePath: /
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /hello:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hello_world
+    get:
+      description: Returns 'Hello' to the caller
+      # used as the method name of the controller
+      operationId: hello
+      parameters:
+        - name: name
+          in: query
+          description: The name of the person to whom to say hello
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloWorldResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /asset:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: asset_controller
+    get:
+      description: Returns data of events for a specified nature or not
+      # used as the method name of the controller
+      operationId: asset
+      parameters:
+        - name: type
+          in: query
+          description: The type of the asset
+          required: true
+          type: string
+        - name: source
+          in: query
+          description: The source of the metrics
+          required: true
+          type: string
+        #- name: conditions
+        #  in: body
+        #  description: The conditions to filter
+        #  required: false
+        #  schema:
+        #   type: array
+        #    items:
+        #     $ref: "#/definitions/ConditionSchema"
+        #- name: filters
+        #  in: body
+        #  description: The filtering of the results
+        #  required: false
+        #  schema:
+        #    type: array
+        #    items:
+        #     $ref: "#/definitions/FilterSchema"
+        - name: data
+          in: body
+          description: The body data for filtering
+          required: false
+          schema:
+            $ref: "#/definitions/OtherSchema"
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              # a pointer to a definition
+              $ref: "#/definitions/AssetDefaultSchema"
+        # reponses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  OtherSchema:
+    summary: The mix
+    description: the mix
+    properties:
+      filterData:
+        schema:
+        type: array
+        items:
+          $ref : '#/definitions/FilterSchema'
+      conditionData:
+        schema:
+        type: array
+        items:
+          $ref : '#/definitions/ConditionSchema'
+  ConditionSchema:
+    required:
+     - keyName
+     - comparatorMode
+     - valueToCompare
+    type: object
+    properties:
+      keyName:
+        type: string
+        description: The key to compare
+      comparatorMode:
+        type: string
+        description: The comparison mode to compare
+      valueToCompare:
+        type: string
+        description: The value to compare
+  FilterSchema:
+    required:
+      - fieldName
+    type: object
+    properties:
+      fieldName:
+        type: string
+        description: The key to filter
+      aggregationMode:
+        type: string
+        description: The comparison mode to filter
+  AssetDefaultSchema:
+    type: object
+    properties:
+      typeof:
+        type: string
+        description: The nature of the data
+      source:
+        type: string
+        description: The origin of the data
+      jsonBodyValue:
+        type: string
+        description: The content of the body in json format
+      stringBodyValue:
+        type: string
+        description: The content of the body in string format
+  HelloWorldResponse:
+     required:
+      - message
+     properties:
+      message:
+        type: string
+  #AssetResponse:
+  #   type: array
+  #   items:
+  #
+  #    $ref: '#/definitions/AssetDefaultSchema'
+  ErrorResponse:
+    required:
+      - mensaje
+    properties:
+      mensaje:
+        type: string

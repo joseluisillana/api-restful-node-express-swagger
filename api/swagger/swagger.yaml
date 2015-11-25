@@ -101,16 +101,15 @@ paths:
 # complex objects have schema definitions
 definitions:
   OtherSchema:
-    summary: The mix
     description: the mix
     properties:
       filterData:
-        schema:
+        #schema:
         type: array
         items:
           $ref : '#/definitions/FilterSchema'
       conditionData:
-        schema:
+        #schema:
         type: array
         items:
           $ref : '#/definitions/ConditionSchema'
